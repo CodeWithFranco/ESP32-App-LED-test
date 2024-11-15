@@ -1,46 +1,50 @@
 #include <BluetoothSerial.h>
 
-BluetoothSerial SerialBT;  // Bluetooth Serial object for ESP32
-
-String command = "";  // Variable to store the received command
+BluetoothSerial SerialBT;
+String strPlaceHolder = "";  // Placeholder for incoming characters
+int cutpoint = 0;            // Integer to store cutpoint value
+String chipset = "";         // String to store chipset value
 
 void setup() {
-    Serial.begin(9600);        // Start Serial Monitor
-    SerialBT.begin("ESP32_LED"); // Start Bluetooth with the name "ESP32_LED"
+    Serial.begin(115200);
+    SerialBT.begin("ESP32_LED");  // Start Bluetooth with the name "ESP32_LED"
     Serial.println("Bluetooth started. Ready to connect.");
 }
 
 void loop() {
     if (SerialBT.available()) {
-        char received = SerialBT.read();  // Read one character from Bluetooth
-        if (received == '\n') {
-            // Print the complete command to the Serial Monitor
-            Serial.print("Received command: ");
-            Serial.println(command);
-            
-            // Process specific commands for verification
-            if (command == "R") {
-                Serial.println("Command: Red LED");
-            } else if (command == "G") {
-                Serial.println("Command: Green LED");
-            } else if (command == "B") {
-                Serial.println("Command: Blue LED");
-            } else if (command == "W") {
-                Serial.println("Command: White LED");
-            } else if (command.startsWith("CP=")) {
-                int cpValue = command.substring(3).toInt();  // Extract CP value
-                Serial.print("Cut Point (CP) value received: ");
-                Serial.println(cpValue);
-            } else if (command.startsWith("Chipset=")) {
-                String chipsetValue = command.substring(8);  // Extract Chipset value
-                Serial.print("Chipset received: ");
-                Serial.println(chipsetValue);
-            }
+        char receivedChar = SerialBT.read();  // Read one character
 
-            // Clear the command string after processing
-            command = "";
-        } else {
-            command += received;  // Append each character to the command string
-        }
+        // Append received character to the placeholder string
+        strPlaceHolder += receivedChar;
+        //Serial.println(strPlaceHolder);
+
+         // Check if we received a newline character, indicating the end of a command
+       if (receivedChar != '\n') {
+            Serial.print("Full command received: ");
+             Serial.println(strPlaceHolder);
+
+    //         // Process command if it starts with "Cutpoint="
+    //         if (strPlaceHolder.startsWith("Cutpoint=")) {
+    //             // Extract the cutpoint value after "Cutpoint="
+    //             String cutpointStr = strPlaceHolder.substring(9);  // Get substring after "Cutpoint="
+    //             cutpoint = cutpointStr.toInt();  // Convert cutpoint to integer
+
+    //             Serial.print("Cutpoint value extracted: ");
+    //             Serial.println(cutpoint);
+    //         }
+    //         // Process command if it starts with "Chipset="
+    //         else if (strPlaceHolder.startsWith("Chipset=")) {
+    //             // Extract the chipset value after "Chipset="
+    //             chipset = strPlaceHolder.substring(8);  // Get substring after "Chipset="
+
+    //             Serial.print("Chipset extracted: ");
+    //             Serial.println(chipset);
+    //         }
+
+    //         // Clear the placeholder for the next command
+    //         strPlaceHolder = "";
+         }
     }
 }
+
