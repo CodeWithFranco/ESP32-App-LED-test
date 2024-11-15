@@ -18,23 +18,21 @@ void loop() {
         // Append received character to the placeholder string
         strPlaceHolder += receivedChar;
 
-        // Check if we have a full "Cutpoint=" command
-        if (strPlaceHolder.startsWith("Cutpoint=") && strPlaceHolder.length() > 9) {
-            // Extract the cutpoint value after "Cutpoint="
-            String cutpointStr = strPlaceHolder.substring(9);  // Get substring after "Cutpoint="
-            cutpoint = cutpointStr.toInt();  // Convert cutpoint to integer
+        // Check if we received the full command (this example assumes no newline is sent, so we process after receiving both keywords)
+        if (strPlaceHolder.startsWith("Cutpoint=") && strPlaceHolder.indexOf("Chipset=") != -1) {
+            // Extract Cutpoint value
+            int cutpointStart = 9;  // Position right after "Cutpoint="
+            int chipsetStart = strPlaceHolder.indexOf("Chipset=");  // Find the start of "Chipset="
 
+            String cutpointStr = strPlaceHolder.substring(cutpointStart, chipsetStart);
+            cutpoint = cutpointStr.toInt();  // Convert Cutpoint to integer
+
+            // Extract Chipset value
+            chipset = strPlaceHolder.substring(chipsetStart + 8);  // Extract everything after "Chipset="
+
+            // Print extracted values for debugging
             Serial.print("Cutpoint value extracted: ");
             Serial.println(cutpoint);
-
-            // Clear the placeholder for the next command
-            strPlaceHolder = "";
-        }
-        // Check if we have a full "Chipset=" command
-        else if (strPlaceHolder.startsWith("Chipset=") && strPlaceHolder.length() > 8) {
-            // Extract the chipset value after "Chipset="
-            chipset = strPlaceHolder.substring(8);  // Get substring after "Chipset="
-
             Serial.print("Chipset extracted: ");
             Serial.println(chipset);
 
