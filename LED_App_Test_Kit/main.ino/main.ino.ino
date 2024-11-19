@@ -1,4 +1,22 @@
+/*******************************************************
+Title: Pixel Test Android App
+Author: Franco Nepomuceno
+Rev: A
+Description: App that controls colors and dimming LEDs
+using MIT App Inventor and the following chipset:
+1. WS2811
+2. UCS2804B
+3. TX1818
+4. WS2814F
+
+Note#1: LED driver is the chip that controls the LEDs   *   
+on tapelight. In this code, the name changed into       *
+chipset as the company uses 'driver' as the name for    *
+power supply
+********************************************************/
+
 #include <BluetoothSerial.h>
+#include "WS2811_TX1818.h"
 
 BluetoothSerial SerialBT;
 String strPlaceHolder = "";  // Placeholder for incoming characters
@@ -33,6 +51,7 @@ void loop() {
             int startIndex = 8;  // Position after "Chipset="
             chipsetStr = strPlaceHolder.substring(startIndex, strPlaceHolder.length());  // Extract remaining string
             isChipsetReceived = true;  // Mark Chipset as received
+            fastLED(chipsetStr, receivedChar);
             Serial.print("Chipset received: ");
             Serial.println(chipsetStr);
             strPlaceHolder = "";  // Clear the buffer
