@@ -8,4 +8,4 @@ c. UCS2804B
 
 d. WS2814
 
-Creating an app is a very new skill that I am learning while enjoying the easier approach of coding blocks rather than using Java. 
+Creating an app is a very new skill that I am learning while enjoying the easier approach of coding blocks rather than using Java. I also used ESP32 board that can connect commands via Bluetooth 
