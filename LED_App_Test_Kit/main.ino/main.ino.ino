@@ -45,6 +45,7 @@ void loop() {
             Serial.print("Cutpoint received: ");
             Serial.println(cutpoint);
             strPlaceHolder = "";  // Clear the buffer
+            receivedChar = '\0';
         }
         // Process Chipset command
         else if (strPlaceHolder.startsWith("Chipset=") && strPlaceHolder.length() >= 14) {
@@ -55,6 +56,7 @@ void loop() {
             Serial.print("Chipset received: ");
             Serial.println(chipsetStr);
             strPlaceHolder = "";  // Clear the buffer
+            receivedChar = '\0';
         }
         // Process Color Commands (Only if CP and Chipset are received)
         else if (isCutpointReceived && isChipsetReceived) {
