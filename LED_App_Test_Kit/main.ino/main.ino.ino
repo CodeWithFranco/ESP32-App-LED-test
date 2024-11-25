@@ -17,6 +17,9 @@ power supply
 
 #include <BluetoothSerial.h>
 #include "WS2811_TX1818.h"
+#include "control.h"
+#include "UCS2904B.h"
+#define PIN 11
 
 BluetoothSerial SerialBT;
 String strPlaceHolder = "";  // Placeholder for incoming characters
@@ -34,46 +37,71 @@ void setup() {
 void loop() {
     if (SerialBT.available()) {
         char receivedChar = SerialBT.read();  // Read one character
+        Serial.println("Initial char received:");
+        Serial.println(receivedChar);
         strPlaceHolder += receivedChar;       // Append the character to the buffer
 
-        // Process Cutpoint command
-        if (strPlaceHolder.startsWith("Cutpoint=") && strPlaceHolder.length() >= 12) {
-            int startIndex = 9;  // Position after "Cutpoint="
-            String cutpointStr = strPlaceHolder.substring(startIndex, startIndex + 3);  // Extract 3 digits
-            cutpoint = cutpointStr.toInt();  // Convert to integer
-            isCutpointReceived = true;  // Mark Cutpoint as received
-            Serial.print("Cutpoint received: ");
-            Serial.println(cutpoint);
-            strPlaceHolder = "";  // Clear the buffer
+       if (isCutpointReceived == false &&  isChipsetReceived == false){
+          // Process Cutpoint command
+          if (strPlaceHolder.startsWith("Cutpoint=") && strPlaceHolder.length() >= 12) {
+              int startIndex = 9;  // Position after "Cutpoint="
+              String cutpointStr = strPlaceHolder.substring(startIndex, startIndex + 3);  // Extract 3 digits
+              cutpoint = cutpointStr.toInt();  // Convert to integer
+              isCutpointReceived = true;  // Mark Cutpoint as received
+              Serial.print("Cutpoint received: ");
+              Serial.println(cutpoint);
+              strPlaceHolder = "";  // Clear the buffer
+              receivedChar = '\0';
+          }
+          // Process Chipset command
+          else if (strPlaceHolder.startsWith("Chipset=") && strPlaceHolder.length() >= 14) {
+              int startIndex = 8;  // Position after "Chipset="
+              chipsetStr = strPlaceHolder.substring(startIndex, strPlaceHolder.length());  // Extract remaining string
+              isChipsetReceived = true;  // Mark Chipset as received
+              fastLED(chipsetStr, receivedChar);
+              Serial.print("Chipset received: ");
+              Serial.println(chipsetStr);
+              strPlaceHolder = "";  // Clear the buffer
+              receivedChar = '\0';
+          }
+        // Cutpoint is NOT receive and Chipset is received
+        else if (isCutpointReceived == false &&  isChipsetReceived == true){
+            Serial.print("Enter Cutpoint Value");
+            // Reject Color Commands if CP or Chipset is missing
+            if (receivedChar == 'R' || receivedChar == 'G' || receivedChar == 'B' || receivedChar == 'W') {
+              Serial.println("Error: Send Cutpoint and Chipset values first!");
+            } 
         }
-        // Process Chipset command
-        else if (strPlaceHolder.startsWith("Chipset=") && strPlaceHolder.length() >= 14) {
-            int startIndex = 8;  // Position after "Chipset="
-            chipsetStr = strPlaceHolder.substring(startIndex, strPlaceHolder.length());  // Extract remaining string
-            isChipsetReceived = true;  // Mark Chipset as received
-            fastLED(chipsetStr, receivedChar);
-            Serial.print("Chipset received: ");
-            Serial.println(chipsetStr);
-            strPlaceHolder = "";  // Clear the buffer
-        }
-        // Process Color Commands (Only if CP and Chipset are received)
-        else if (isCutpointReceived && isChipsetReceived) {
-            if (receivedChar == 'R') {
-                Serial.println("Color: Red");
-            } else if (receivedChar == 'G') {
-                Serial.println("Color: Green");
-            } else if (receivedChar == 'B') {
-                Serial.println("Color: Blue");
-            } else if (receivedChar == 'W') {
-                Serial.println("Color: White");
+        //Cutpoint is received and Chipset is NOT received
+        else if (isCutpointReceived == true &&  isChipsetReceived == false){
+            Serial.print("Enter Chipset Value");
+            // Reject Color Commands if CP or Chipset is missing
+            if (receivedChar == 'R' || receivedChar == 'G' || receivedChar == 'B' || receivedChar == 'W') {
+              Serial.println("Error: Send Cutpoint and Chipset values first!");
             }
         }
-        // Reject Color Commands if CP or Chipset is missing
-        else if (receivedChar == 'R' || receivedChar == 'G' || receivedChar == 'B' || receivedChar == 'W') {
-            Serial.println("Error: Send Cutpoint and Chipset values first!");
+        //Cutpoint and Chipset are NOT received
+        else if (isCutpointReceived == false &&  isChipsetReceived == false){
+            Serial.print("Enter Chipset and Cutpoint Value");
+            // Reject Color Commands if CP or Chipset is missing
+            if (receivedChar == 'R' || receivedChar == 'G' || receivedChar == 'B' || receivedChar == 'W') {
+              Serial.println("Error: Send Cutpoint and Chipset values first!");
+            }
         }
-    }
+        //Cutpoint and Chipset are received
+        else{
+          Serial.println("Chipset: ");
+          Serial.println(chipsetStr);
+          Serial.println("Cutpoint: ");
+          Serial.println(cutpoint);
+          if (receivedChar == 'R' || receivedChar == 'G' || receivedChar == 'B' || receivedChar == 'W') {
+            Control(cutpoint, chipsetStr, receivedChar);
+          }
+        }
+      }
+  }
 }
 
         
+
 
