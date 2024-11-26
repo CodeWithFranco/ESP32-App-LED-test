@@ -21,6 +21,8 @@ power supply
 #include "UCS2904B.h"
 #define PIN 11
 
+CRGB *leds;                   // Allocated array for FASTLEDs - Pointer 
+
 BluetoothSerial SerialBT;
 String strPlaceHolder = "";  // Placeholder for incoming characters
 int cutpoint = 0;            // Integer to store cutpoint value

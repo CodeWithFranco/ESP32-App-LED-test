@@ -1,5 +1,8 @@
 #include <FastLED.h>
+#define DATA_PIN 11
+CRGB *leds;  
 
+FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, CP);
 
 void fastLED(CRGB* leds, int CP, char color) {
     if (color == 'R') {
