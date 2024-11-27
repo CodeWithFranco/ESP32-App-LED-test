@@ -1,8 +1,5 @@
 #include <Adafruit_NeoPixel.h>
-#define PIN 11
  
-
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(0, PIN, NEO_RGBW + NEO_KHZ800);
 // Function prototypes
 void setAllPixels(int CP, uint8_t red, uint8_t green, uint8_t blue, uint8_t white);
 

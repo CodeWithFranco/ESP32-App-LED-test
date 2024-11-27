@@ -19,7 +19,7 @@ power supply
 #include "WS2811_TX1818.h"
 #include "control.h"
 #include "UCS2904B.h"
-#define PIN 11
+#define DATA_PIN 11
 
 CRGB *leds;                   // Allocated array for FASTLEDs - Pointer 
 
@@ -65,6 +65,12 @@ void loop() {
               Serial.println(chipsetStr);
               strPlaceHolder = "";  // Clear the buffer
               receivedChar = '\0';
+              if (chipsetStr == WS2811 || chipsetStr == TX1818){
+                FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, cutpoint);
+              }
+              else if (chipsetStr == UCS2904B){
+                Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, DATA_PIN, LED_TYPE + NEO_KHZ800);
+              }
           }
         // Cutpoint is NOT receive and Chipset is received
         else if (isCutpointReceived == false &&  isChipsetReceived == true){
