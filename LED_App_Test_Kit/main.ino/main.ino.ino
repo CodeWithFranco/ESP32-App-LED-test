@@ -17,7 +17,6 @@ power supply
 
 #include <BluetoothSerial.h>
 #include "WS2811_TX1818.h"
-#include "control.h"
 #include "UCS2904B.h"
 #define DATA_PIN 11
 
@@ -53,25 +52,16 @@ void loop() {
               Serial.print("Cutpoint received: ");
               Serial.println(cutpoint);
               strPlaceHolder = "";  // Clear the buffer
-              receivedChar = '\0';
           }
           // Process Chipset command
           else if (strPlaceHolder.startsWith("Chipset=") && strPlaceHolder.length() >= 14) {
               int startIndex = 8;  // Position after "Chipset="
               chipsetStr = strPlaceHolder.substring(startIndex, strPlaceHolder.length());  // Extract remaining string
               isChipsetReceived = true;  // Mark Chipset as received
-              fastLED(chipsetStr, receivedChar);
               Serial.print("Chipset received: ");
               Serial.println(chipsetStr);
               strPlaceHolder = "";  // Clear the buffer
-              receivedChar = '\0';
-              if (chipsetStr == WS2811 || chipsetStr == TX1818){
-                FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, cutpoint);
-              }
-              else if (chipsetStr == UCS2904B){
-                Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, DATA_PIN, LED_TYPE + NEO_KHZ800);
-              }
-          }
+            }
         // Cutpoint is NOT receive and Chipset is received
         else if (isCutpointReceived == false &&  isChipsetReceived == true){
             Serial.print("Enter Cutpoint Value");
@@ -102,11 +92,24 @@ void loop() {
           Serial.println(chipsetStr);
           Serial.println("Cutpoint: ");
           Serial.println(cutpoint);
-          if (receivedChar == 'R' || receivedChar == 'G' || receivedChar == 'B' || receivedChar == 'W') {
-            Control(cutpoint, chipsetStr, receivedChar);
+          if (chipsetStr == 'WS2811' || chipsetStr == 'TX1818'){
+            FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, cutpoint);
+            if (receivedChar == 'R' || receivedChar == 'G' || receivedChar == 'B' || receivedChar == 'W') {
+                fastLED(leds, cutpoint, receivedChar);
+            }
+          }
+          else if (chipsetStr == 'UCS2904B'){
+            if (receivedChar == 'R' || receivedChar == 'G' || receivedChar == 'B' || receivedChar == 'W') {
+                neoPixel_1(cutpoint, receivedChar);
+            }
+          }
+          else if (chipsetStr == 'WS2814'){
+            if (receivedChar == 'R' || receivedChar == 'G' || receivedChar == 'B' || receivedChar == 'W') {
+                neoPixel_2(cutpoint, receivedChar);
           }
         }
       }
+    }
   }
 }
 
