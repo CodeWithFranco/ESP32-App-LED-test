@@ -4,10 +4,10 @@ Author: Franco Nepomuceno
 Rev: A
 Description: App that controls colors and dimming LEDs
 using MIT App Inventor and the following chipset:
-1. WS2811
-2. UCS2804B
-3. TX1818
-4. WS2814F
+1. WS2811: Fastled Library
+2. UCS2804B: Adafruit NeoPixel Library
+3. TX1818: Fastled Library
+4. WS2814F: Adafruit NeoPixel Library
 
 Note#1: LED driver is the chip that controls the LEDs   *   
 on tapelight. In this code, the name changed into       *
@@ -38,8 +38,8 @@ void setup() {
 void loop() {
     if (SerialBT.available()) {
         char receivedChar = SerialBT.read();  // Read one character
-        Serial.println("Initial char received:");
-        Serial.println(receivedChar);
+        //Serial.println("Initial char received:");
+        //Serial.println(receivedChar);
         strPlaceHolder += receivedChar;       // Append the character to the buffer
 
        if (isCutpointReceived == false &&  isChipsetReceived == false){
@@ -54,10 +54,10 @@ void loop() {
               strPlaceHolder = "";  // Clear the buffer
           }
           // Process Chipset command
-          else if (strPlaceHolder.startsWith("Chipset=") && strPlaceHolder.length() >= 14) {
+          else if (strPlaceHolder.startsWith("Chipset=") && strPlaceHolder.length() >= 9) {
               int startIndex = 8;  // Position after "Chipset="
-              chipsetStr = strPlaceHolder.substring(startIndex, strPlaceHolder.length());  // Extract remaining string
-              isChipsetReceived = true;  // Mark Chipset as received
+              chipsetStr = strPlaceHolder.substring(startIndex);
+              isChipsetReceived = true;
               Serial.print("Chipset received: ");
               Serial.println(chipsetStr);
               strPlaceHolder = "";  // Clear the buffer
@@ -78,32 +78,24 @@ void loop() {
               Serial.println("Error: Send Cutpoint and Chipset values first!");
             }
         }
-        //Cutpoint and Chipset are NOT received
-        else if (isCutpointReceived == false &&  isChipsetReceived == false){
-            Serial.print("Enter Chipset and Cutpoint Value");
-            // Reject Color Commands if CP or Chipset is missing
-            if (receivedChar == 'R' || receivedChar == 'G' || receivedChar == 'B' || receivedChar == 'W') {
-              Serial.println("Error: Send Cutpoint and Chipset values first!");
-            }
-        }
         //Cutpoint and Chipset are received
         else{
           Serial.println("Chipset: ");
           Serial.println(chipsetStr);
           Serial.println("Cutpoint: ");
           Serial.println(cutpoint);
-          if (chipsetStr == 'WS2811' || chipsetStr == 'TX1818'){
+          if (chipsetStr == "WS2811" || chipsetStr == "TX1818"){
             FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, cutpoint);
             if (receivedChar == 'R' || receivedChar == 'G' || receivedChar == 'B' || receivedChar == 'W') {
                 fastLED(leds, cutpoint, receivedChar);
             }
           }
-          else if (chipsetStr == 'UCS2904B'){
+          else if (chipsetStr == "UCS2904B"){
             if (receivedChar == 'R' || receivedChar == 'G' || receivedChar == 'B' || receivedChar == 'W') {
                 neoPixel_1(cutpoint, receivedChar);
             }
           }
-          else if (chipsetStr == 'WS2814'){
+          else if (chipsetStr == "WS2814"){
             if (receivedChar == 'R' || receivedChar == 'G' || receivedChar == 'B' || receivedChar == 'W') {
                 neoPixel_2(cutpoint, receivedChar);
           }
