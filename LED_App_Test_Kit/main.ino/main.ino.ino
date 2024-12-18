@@ -42,69 +42,59 @@ void loop() {
         //Serial.println(receivedChar);
         strPlaceHolder += receivedChar;       // Append the character to the buffer
 
-       if (isCutpointReceived == false &&  isChipsetReceived == false){
-          // Process Cutpoint command
-          if (strPlaceHolder.startsWith("Cutpoint=") && strPlaceHolder.length() >= 12) {
-              int startIndex = 9;  // Position after "Cutpoint="
-              String cutpointStr = strPlaceHolder.substring(startIndex, startIndex + 3);  // Extract 3 digits
-              cutpoint = cutpointStr.toInt();  // Convert to integer
-              isCutpointReceived = true;  // Mark Cutpoint as received
-              Serial.print("Cutpoint received: ");
-              Serial.println(cutpoint);
-              strPlaceHolder = "";  // Clear the buffer
+        // Process Cutpoint command
+        if (strPlaceHolder.startsWith("Cutpoint=") && strPlaceHolder.length() >= 12 && isCutpointReceived == false) {
+            int startIndex1 = 9;  // Position after "Cutpoint="
+            String cutpointStr = strPlaceHolder.substring(startIndex1, startIndex1 + 3);  // Extract 3 digits
+            cutpoint = cutpointStr.toInt();  // Convert to integer
+            isCutpointReceived = true;  // Mark Cutpoint as received
+            //Serial.print("Cutpoint received: ");
+            Serial.println(cutpoint);
+            strPlaceHolder = "";  // Clear the buffer
           }
-          // Process Chipset command
-          else if (strPlaceHolder.startsWith("Chipset=") && strPlaceHolder.length() >= 9) {
-              int startIndex = 8;  // Position after "Chipset="
-              chipsetStr = strPlaceHolder.substring(startIndex);
-              isChipsetReceived = true;
-              Serial.print("Chipset received: ");
-              Serial.println(chipsetStr);
-              strPlaceHolder = "";  // Clear the buffer
-            }
-        // Cutpoint is NOT receive and Chipset is received
-        else if (isCutpointReceived == false &&  isChipsetReceived == true){
-            Serial.print("Enter Cutpoint Value");
-            // Reject Color Commands if CP or Chipset is missing
-            if (receivedChar == 'R' || receivedChar == 'G' || receivedChar == 'B' || receivedChar == 'W') {
-              Serial.println("Error: Send Cutpoint and Chipset values first!");
-            } 
+        // Process Chipset command
+        else if (strPlaceHolder.startsWith("Chipset=") && strPlaceHolder.length() >= 9 && isChipsetReceived == false) {
+            int startIndex2 = 8;  // Position after "Chipset="
+            chipsetStr = strPlaceHolder.substring(startIndex2);
+            isChipsetReceived = true;
+            Serial.print("Chipset received: ");
+            Serial.println(chipsetStr);
+            strPlaceHolder = "";  // Clear the buffer
+          }
+        //RGBW Command - if Chipset & Cutpoint = false
+        else if (isChipsetReceived == false && isCutpointReceived == false && strPlaceHolder == "R" || strPlaceHolder == "G" || strPlaceHolder == "B" || strPlaceHolder =="W" ){
+          Serial.println("Error CP and Chipset NOT received");
         }
-        //Cutpoint is received and Chipset is NOT received
-        else if (isCutpointReceived == true &&  isChipsetReceived == false){
-            Serial.print("Enter Chipset Value");
-            // Reject Color Commands if CP or Chipset is missing
-            if (receivedChar == 'R' || receivedChar == 'G' || receivedChar == 'B' || receivedChar == 'W') {
-              Serial.println("Error: Send Cutpoint and Chipset values first!");
-            }
+        //RGBW Command - if Chipset = true & CP = false
+        else if (isChipsetReceived == true && isCutpointReceived == false && strPlaceHolder == "R" || strPlaceHolder == "G" || strPlaceHolder == "B" || strPlaceHolder =="W" ){
+          Serial.println("Error CP NOT received");
         }
-        //Cutpoint and Chipset are received
-        else{
-          Serial.println("Chipset: ");
-          Serial.println(chipsetStr);
-          Serial.println("Cutpoint: ");
-          Serial.println(cutpoint);
-          if (chipsetStr == "WS2811" || chipsetStr == "TX1818"){
-            FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, cutpoint);
-            if (receivedChar == 'R' || receivedChar == 'G' || receivedChar == 'B' || receivedChar == 'W') {
-                fastLED(leds, cutpoint, receivedChar);
-            }
-          }
-          else if (chipsetStr == "UCS2904B"){
-            if (receivedChar == 'R' || receivedChar == 'G' || receivedChar == 'B' || receivedChar == 'W') {
-                neoPixel_1(cutpoint, receivedChar);
-            }
-          }
-          else if (chipsetStr == "WS2814"){
-            if (receivedChar == 'R' || receivedChar == 'G' || receivedChar == 'B' || receivedChar == 'W') {
-                neoPixel_2(cutpoint, receivedChar);
-          }
+        //RGBW Command - if Chipset = false & CP = true
+        else if (isChipsetReceived == false && isCutpointReceived == true && strPlaceHolder == "R" || strPlaceHolder == "G" || strPlaceHolder == "B" || strPlaceHolder =="W" ){
+          Serial.println("Error chipset NOT received");
         }
-      }
-    }
-  }
+        //RGBW Command - if Chipset = true & CP = truex
+        else if (isChipsetReceived == true && isCutpointReceived == true && strPlaceHolder == "R"){
+          Serial.println(strPlaceHolder);
+          strPlaceHolder = "";
+        }
+        //RGBW Command - if Chipset = true & CP = true
+        else if (isChipsetReceived == true && isCutpointReceived == true && strPlaceHolder == "G"){
+          Serial.println(strPlaceHolder);
+          strPlaceHolder = "";
+        }
+        //RGBW Command - if Chipset = true & CP = true
+        else if (isChipsetReceived == true && isCutpointReceived == true && strPlaceHolder == "B"){
+          Serial.println(strPlaceHolder);
+          strPlaceHolder = "";
+        }
+        //RGBW Command - if Chipset = true & CP = true
+        else if (isChipsetReceived == true && isCutpointReceived == true && strPlaceHolder == "W"){
+          Serial.println(strPlaceHolder);
+          strPlaceHolder = "";
+        }
+      } 
 }
-
         
 
 
