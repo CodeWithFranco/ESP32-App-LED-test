@@ -121,10 +121,10 @@ void loop() {
           Serial.println("ERROR: Invalid Color Command");
           //strPlaceHolder = "";  // Clear the buffer to allow new CP or Chipset commands
         }
-      } else {
+      } /*else {
         Serial.println("Error: CP and Chipset not received yet");
         strPlaceHolder = "";  // Clear the buffer to allow new CP or Chipset commands
-      }
+      }*/
     }
   } else {
     if (isBTStarted) {
