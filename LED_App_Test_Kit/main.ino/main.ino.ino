@@ -26,8 +26,8 @@ BluetoothSerial SerialBT;     //Bluetooth object
 bool isBTStarted = false;     //Track BT state
 
 String strPlaceHolder = "";  // Placeholder for incoming characters
-String colorSelect = "";
 int cutpoint = 0;            // Integer to store cutpoint value
+int colorSelect = -1;        // Initialize as -1(no color selected)        
 String chipsetStr = "";      // String to store chipset value
 bool isCutpointReceived = false;  // Flag to track Cutpoint reception
 bool isChipsetReceived = false;   // Flag to track Chipset reception
@@ -37,7 +37,6 @@ bool isColorSelected = false; //Flag to track color selection
 void setup() {
     Serial.begin(115200);
     SerialBT.begin("ESP32_LED");  // Start Bluetooth with the name "ESP32_LED"
-    isBTStarted = true;
     Serial.println("Bluetooth started. Ready to connect.");
 }
 
@@ -87,46 +86,72 @@ void loop() {
       else if (isChipsetReceived && isCutpointReceived) {  // Only process if CP and Chipset are set
         if (strPlaceHolder == "R") {
           isColorSelected = false;                        //Makes the boolean false if user selected a color previously
-          colorSelect = "";                               //Makes sure the string location is empty for previous allocation
+          colorSelect = -1;                               //Makes sure the location is "No color" for previous allocation
           Serial.println(strPlaceHolder);
-          colorSelect = strPlaceHolder;                   //Another location for a color
+          colorSelect = 0;                                 //Another location for a color (0 = RED)
           isColorSelected = true;                         //True if user selects a color
           //Serial.println("Red Command Received");
           strPlaceHolder = "";  // Clear the buffer
         } else if (strPlaceHolder == "G") {
           isColorSelected = false;                        //Makes the boolean false if user selected a color previously
-          colorSelect = "";                               //Makes sure the string location is empty for previous allocation
+          colorSelect = -1;                               //Makes sure the location is "No color" for previous allocation
           Serial.println(strPlaceHolder);
-          colorSelect = strPlaceHolder;                   //Another location for a color
+          colorSelect = 1;                                //Another location for a color (1 = GREEN)
           isColorSelected = true;                         //True if user selects a color
           //Serial.println("Green Command Received");
           strPlaceHolder = "";  // Clear the buffer
         } else if (strPlaceHolder == "B") {
           isColorSelected = false;                        //Makes the boolean false if user selected a color previously
-          colorSelect = "";                               //Makes sure the string location is empty for previous allocation
+          colorSelect = -1;                               //Makes sure the location is "No color" for previous allocation
           Serial.println(strPlaceHolder);
-          colorSelect = strPlaceHolder;                   //Another location for a color
+          colorSelect = 2;                                //Another location for a color (2 = Blue)
           isColorSelected = true;                         //True if user selects a color
           //Serial.println("Blue Command Received");
           strPlaceHolder = "";  // Clear the buffer
         } else if (strPlaceHolder == "W") {
           isColorSelected = false;                        //Makes the boolean false if user selected a color previously
-          colorSelect = "";                               //Makes sure the string location is empty for previous allocation
+          colorSelect = -1;                               //Makes sure the location is "No color" for previous allocation
           Serial.println(strPlaceHolder);
-          colorSelect = strPlaceHolder;                   //Another location for a color
+          colorSelect = 3;                                //Another location for a color (3 = White)
           isColorSelected = true;                         //True if user selects a color
           //Serial.println("White Command Received");
           strPlaceHolder = "";  // Clear the buffer
-        } else {
-          Serial.println("ERROR: Invalid Color Command");
-          //strPlaceHolder = "";  // Clear the buffer to allow new CP or Chipset commands
         }
-      } /*else {
-        Serial.println("Error: CP and Chipset not received yet");
-        strPlaceHolder = "";  // Clear the buffer to allow new CP or Chipset commands
-      }*/
+      }
+      //Process Dimming Command
+      else if  (isChipsetReceived && isCutpointReceived && isColorSelected){
+          if (strPlaceHolder.length() > 1 && strPlaceHolder.length() < 4) {  // Process dimming command (e.g., R255 or G1)
+            //char color = strPlaceHolder.charAt(0);  // Extract color ('R', 'G', 'B', 'W')
+            int brightness = strPlaceHolder.substring(1).toInt();  // Extract brightness value
+            brightness = constrain(brightness, 0, 255);  // Ensure brightness is within range
+
+          switch (colorSelect) {
+              case 'R':
+                  Serial.println("Dimming Red: " + String(brightness));
+                  // Add LED code for Red brightness adjustment here
+                  break;
+              case 'G':
+                  Serial.println("Dimming Green: " + String(brightness));
+                  // Add LED code for Green brightness adjustment here
+                  break;
+              case 'B':
+                  Serial.println("Dimming Blue: " + String(brightness));
+                  // Add LED code for Blue brightness adjustment here
+                  break;
+              case 'W':
+                  Serial.println("Dimming White: " + String(brightness));
+                  // Add LED code for White brightness adjustment here
+                  break;
+              default:
+                  Serial.println("ERROR: Invalid Dimming Command");
+                  break;
+          }
+        }
+      }
+    
     }
-  } else {
+  }   
+    else {
     if (isBTStarted) {
       // Handle Bluetooth disconnection
       Serial.println("Bluetooth Disconnected. Waiting to connect...");
@@ -136,14 +161,14 @@ void loop() {
       isCutpointReceived = false;
       isChipsetReceived = false;
       isColorSelected = false;
-      colorSelect = "";
+      colorSelect = -1;
       strPlaceHolder = "";
       
     }
-
     delay(3000);
     Serial.println("Restarting Bluetooth...");
     SerialBT.begin("ESP32_LED");  // Restart Bluetooth
     isBTStarted = true;
   }
 }
+
