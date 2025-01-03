@@ -21,8 +21,8 @@ String chipsetStr = "";      // String to store chipset value
 int cutpoint = 0;            // Integer to store cutpoint value
 int colorSelect = -1;        // Initialize as -1 (no color selected)    
 int intensity = 1;            // Brightness level (1-255)    
-
-
+int chipsetInt = 0;
+ 
 bool isBTStarted = false;     // Track BT state
 bool isCutpointReceived = false;  // Flag to track Cutpoint reception
 bool isChipsetReceived = false;   // Flag to track Chipset reception
@@ -42,6 +42,7 @@ void loop() {
     {
         if (SerialBT.available()) 
         {
+            delay(15);         
             String receivedChar = SerialBT.readStringUntil('\n');  // Read one String at a time
             strPlaceHolder = receivedChar;       // Append the character to the buffer
             
@@ -71,9 +72,27 @@ void loop() {
                 if (chipsetStr.length() > 0) 
                 {  // Validate chipset value
                     isChipsetReceived = true;
+                    chipsetInt = chipsetStr.toInt();
                     Serial.print("Chipset received: ");
-                    Serial.println(chipsetStr);
+                    Serial.println(chipsetInt);
                     strPlaceHolder = "";  // Clear the buffer
+                    if (chipsetInt == 1)
+                    {
+                      //WS2811
+                      FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, cutpoint);
+                    }
+                    else if (chipsetInt == 2)
+                    {
+                      //TX1818
+                    }
+                    else if (chipsetInt == 3)
+                    {
+                      //UCS2804
+                    }
+                    else if (chipsetInt == 4)
+                    {
+                      //WS2814
+                    }
                 } 
             }
             // Process Color Commands (R, G, B, W)
