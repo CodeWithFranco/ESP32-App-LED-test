@@ -44,8 +44,10 @@ void loop() {
         {
             String receivedChar = SerialBT.readStringUntil('\n');  // Read one String at a time
             strPlaceHolder = receivedChar;       // Append the character to the buffer
-            Serial.println("\nReceived: ");
-            Serial.print(strPlaceHolder);
+            
+            //Check value
+            //Serial.print("Value: ");
+            //Serial.println(strPlaceHolder);
 
             // Process Cutpoint command
             if (strPlaceHolder.startsWith("Cutpoint=") && strPlaceHolder.length() >= 12 && !isCutpointReceived) 
@@ -56,7 +58,7 @@ void loop() {
                 if (cutpoint > 0) 
                 {  // Validate cutpoint value
                     isCutpointReceived = true;  // Mark Cutpoint as received
-                    Serial.print("\nCutpoint received: ");
+                    Serial.print("Cutpoint received: ");
                     Serial.println(cutpoint);
                     strPlaceHolder = "";  // Clear the buffer
                 } 
@@ -69,31 +71,36 @@ void loop() {
                 if (chipsetStr.length() > 0) 
                 {  // Validate chipset value
                     isChipsetReceived = true;
-                    Serial.print("\nChipset received: ");
+                    Serial.print("Chipset received: ");
                     Serial.println(chipsetStr);
                     strPlaceHolder = "";  // Clear the buffer
                 } 
             }
             // Process Color Commands (R, G, B, W)
-            else if (isChipsetReceived && isCutpointReceived && (strPlaceHolder == "Red" || strPlaceHolder == "Green" || strPlaceHolder == "Blue" || strPlaceHolder == "White")) 
+            else if (strPlaceHolder == "Red" || strPlaceHolder == "Green" || strPlaceHolder == "Blue" || strPlaceHolder == "White")
             {  // Only process if CP and Chipset are set
-                if (strPlaceHolder == "R") {
+                if (strPlaceHolder == "Red") {
                     colorSelect = 0;  // 0 for Red
                     strPlaceHolder = "";  // Clear the buffer
                     Serial.println("R");
-                } else if (strPlaceHolder == "G") { 
+                } else if (strPlaceHolder == "Green") { 
                     colorSelect = 1;  // 1 for Green
                     strPlaceHolder = "";  // Clear the buffer
                     Serial.println("G");
-                } else if (strPlaceHolder == "B") {
+                } else if (strPlaceHolder == "Blue") {
                     colorSelect = 2;  // 2 for Blue
                     strPlaceHolder = "";  // Clear the buffer
                     Serial.println("B");
-                } else if (strPlaceHolder == "W") {
+                } else if (strPlaceHolder == "White") {
                     colorSelect = 3;  // 3 for White
                     strPlaceHolder = "";  // Clear the buffer
                     Serial.println("W");
                 }
+            }
+            else if (isChipsetReceived && isCutpointReceived)
+            {
+              Serial.print("Brightness: ");
+              Serial.println(strPlaceHolder);
             }
         } 
       }
