@@ -47,8 +47,8 @@ void loop() {
             strPlaceHolder = receivedChar;       // Append the character to the buffer
             
             //Check value
-            //Serial.print("Value: ");
-            //Serial.println(strPlaceHolder);
+            Serial.print("Value: ");
+            Serial.println(receivedChar);
 
             // Process Cutpoint command
             if (strPlaceHolder.startsWith("Cutpoint=") && strPlaceHolder.length() >= 12 && !isCutpointReceived) 
@@ -93,10 +93,10 @@ void loop() {
                     {
                       //WS2814
                     }
-                } 
-            }
+                  } 
+              }
             // Process Color Commands (R, G, B, W)
-            else if (strPlaceHolder == "Red" || strPlaceHolder == "Green" || strPlaceHolder == "Blue" || strPlaceHolder == "White")
+            else if ((strPlaceHolder == "Red" || strPlaceHolder == "Green" || strPlaceHolder == "Blue" || strPlaceHolder == "White") && isCutpointReceived && isChipsetReceived)
             {  // Only process if CP and Chipset are set
                 if (strPlaceHolder == "Red") {
                     colorSelect = 0;  // 0 for Red
@@ -115,13 +115,24 @@ void loop() {
                     strPlaceHolder = "";  // Clear the buffer
                     Serial.println("W");
                 }
-            }
-            else if (isChipsetReceived && isCutpointReceived)
-            {
-              Serial.print("Brightness: ");
-              Serial.println(strPlaceHolder);
-            }
-        } 
+              }
+          else if (isCutpointReceived && isChipsetReceived && isNumber(strPlaceHolder))
+          {
+            Serial.print("Brightness: ");
+            Serial.println(strPlaceHolder);
+          }
+          strPlaceHolder = "";
+          receivedChar = "";
+        }
       }
+}
+
+bool isNumber(String str) {
+    for (int i = 0; i < str.length(); i++) {
+        if (!isDigit(str[i])) {
+            return false;  // If any character is not a digit, return false
+        }
+    }
+    return true;  // All characters are digits
 }
 
