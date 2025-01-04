@@ -43,12 +43,11 @@ void loop() {
         if (SerialBT.available()) 
         {
             delay(15);         
-            String receivedChar = SerialBT.readStringUntil('\n');  // Read one String at a time
-            strPlaceHolder = receivedChar;       // Append the character to the buffer
+            strPlaceHolder = SerialBT.readStringUntil('\n');  // Read one String at a time
             
             //Check value
             Serial.print("Value: ");
-            Serial.println(receivedChar);
+            Serial.println(strPlaceHolder);
 
             // Process Cutpoint command
             if (strPlaceHolder.startsWith("Cutpoint=") && strPlaceHolder.length() >= 12 && !isCutpointReceived) 
@@ -120,9 +119,8 @@ void loop() {
           {
             Serial.print("Brightness: ");
             Serial.println(strPlaceHolder);
+            strPlaceHolder = "";
           }
-          strPlaceHolder = "";
-          receivedChar = "";
         }
       }
 }
