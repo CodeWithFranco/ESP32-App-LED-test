@@ -80,21 +80,25 @@ void loop() {
                     {
                       //WS2811
                       FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, cutpoint);
+                      //FastLED.show();
                     }
                     else if (chipsetInt == 2)
                     {
                       //TX1818
                       FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, cutpoint);
+                      //FastLED.show();
                     }
                     else if (chipsetInt == 3)
                     {
                       //UCS2804
-                      Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, DATA_PIN, NEO_RGBW + NEO_KHZ800); // Initialize with 0 LEDs initially
+                      //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, DATA_PIN, NEO_RGBW + NEO_KHZ800); // Initialize with 0 LEDs initially
+                      //FastLED.show();
                     }
                     else if (chipsetInt == 4)
                     {
                       //WS2814
-                      Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, DATA_PIN, NEO_RGBW + NEO_KHZ800);
+                      //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, DATA_PIN, NEO_RGBW + NEO_KHZ800);
+                      //FastLED.show();
                     }
                   } 
               }

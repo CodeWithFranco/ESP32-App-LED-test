@@ -21,9 +21,9 @@ void fastLED(CRGB* leds, int CP, int color, int brightness) {
     } else if (color == 3) {
         for (int i = 0; i < CP; i++) {
             leds[i] = CRGB::White;
+            if (i % 10 == 0) yield(); // Feed the watchdog every 10 LEDs
         }
     }
     FastLED.setBrightness(brightness);
     FastLED.show();
-    yield();  // Feed the watchdog
 }
