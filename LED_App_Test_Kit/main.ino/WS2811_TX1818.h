@@ -1,26 +1,29 @@
 #include <FastLED.h>
 
-void fastLED(CRGB* leds, int CP, char color) {
-    if (color == 'R') {
-        // Turn all LEDs to red
+void fastLED(CRGB* leds, int CP, int color, int brightness) {
+    if (CP <= 0 || CP > 999) {  // Validate CP
+        Serial.println("Invalid CP value!");
+        return;
+    }
+
+    if (color == 0) {
         for (int i = 0; i < CP; i++) {
             leds[i] = CRGB::Red;
         }
-    } else if (color == 'G') {
-        // Turn all LEDs to green
+    } else if (color == 1) {
         for (int i = 0; i < CP; i++) {
             leds[i] = CRGB::Green;
         }
-    } else if (color == 'B') {
-        // Turn all LEDs to blue
+    } else if (color == 2) {
         for (int i = 0; i < CP; i++) {
             leds[i] = CRGB::Blue;
         }
-    } else if (color == 'W') {
-        // Turn all LEDs to white
+    } else if (color == 3) {
         for (int i = 0; i < CP; i++) {
             leds[i] = CRGB::White;
         }
     }
+    FastLED.setBrightness(brightness);
     FastLED.show();
+    yield();  // Feed the watchdog
 }

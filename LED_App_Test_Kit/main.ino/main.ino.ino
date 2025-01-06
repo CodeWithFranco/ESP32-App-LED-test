@@ -11,17 +11,18 @@ using MIT App Inventor and the following chipset:
 ********************************************************/
 
 #include <BluetoothSerial.h>
+#include <FastLED.h>
 #include "WS2811_TX1818.h"
-#include "UCS2904B.h"
+#include "UCS2904B_WS2814.h"
 #define DATA_PIN 11
 
 String strPlaceHolder = "";  // Placeholder for incoming characters
 String chipsetStr = "";      // String to store chipset value
 
 int cutpoint = 0;            // Integer to store cutpoint value
-int colorSelect = -1;        // Initialize as -1 (no color selected)    
-int intensity = 1;            // Brightness level (1-255)    
+int colorSelect = -1;        // Initialize as -1 (no color selected)     
 int chipsetInt = 0;
+int intBrightness = 1;       // initial brightness
  
 bool isBTStarted = false;     // Track BT state
 bool isCutpointReceived = false;  // Flag to track Cutpoint reception
@@ -46,8 +47,8 @@ void loop() {
             strPlaceHolder = SerialBT.readStringUntil('\n');  // Read one String at a time
             
             //Check value
-            Serial.print("Value: ");
-            Serial.println(strPlaceHolder);
+            //Serial.print("Value: ");
+            //Serial.println(strPlaceHolder);
 
             // Process Cutpoint command
             if (strPlaceHolder.startsWith("Cutpoint=") && strPlaceHolder.length() >= 12 && !isCutpointReceived) 
@@ -83,14 +84,17 @@ void loop() {
                     else if (chipsetInt == 2)
                     {
                       //TX1818
+                      FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, cutpoint);
                     }
                     else if (chipsetInt == 3)
                     {
                       //UCS2804
+                      Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, DATA_PIN, NEO_RGBW + NEO_KHZ800); // Initialize with 0 LEDs initially
                     }
                     else if (chipsetInt == 4)
                     {
                       //WS2814
+                      Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, DATA_PIN, NEO_RGBW + NEO_KHZ800);
                     }
                   } 
               }
@@ -101,28 +105,147 @@ void loop() {
                     colorSelect = 0;  // 0 for Red
                     strPlaceHolder = "";  // Clear the buffer
                     Serial.println("R");
-                } else if (strPlaceHolder == "Green") { 
+                    switch(chipsetInt)
+                    {
+                      case 1: //WS2811
+                      {
+                      fastLED(leds, cutpoint, colorSelect, intBrightness);
+                      break;
+                      }
+                      case 2: //TX1818
+                      {
+                      fastLED(leds, cutpoint, colorSelect, intBrightness);
+                      break;
+                      }
+                      case 3: //UCS2804
+                      {
+                      //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800); // Initialize with 0 LEDs initially
+                      break;
+                      }
+                      case 4: //WS2814
+                      {
+                      //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800);
+                      break;
+                      }
+                    }
+                  } else if (strPlaceHolder == "Green") { 
                     colorSelect = 1;  // 1 for Green
                     strPlaceHolder = "";  // Clear the buffer
                     Serial.println("G");
+                    switch(chipsetInt)
+                    {
+                      case 1: //WS2811
+                      {
+                      fastLED(leds, cutpoint, colorSelect, intBrightness);
+                      break;
+                      }
+                      case 2: //TX1818
+                      {
+                      fastLED(leds, cutpoint, colorSelect, intBrightness);
+                      break;
+                      }
+                      case 3: //UCS2804
+                      {
+                      //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800); // Initialize with 0 LEDs initially
+                      break;
+                      }
+                      case 4: //WS2814
+                      {
+                      //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800);
+                      break;
+                      }
+                    }
                 } else if (strPlaceHolder == "Blue") {
                     colorSelect = 2;  // 2 for Blue
                     strPlaceHolder = "";  // Clear the buffer
                     Serial.println("B");
+                    switch(chipsetInt)
+                    {
+                      case 1: //WS2811
+                      {
+                      fastLED(leds, cutpoint, colorSelect, intBrightness);
+                      break;
+                      }
+                      case 2: //TX1818
+                      {
+                      fastLED(leds, cutpoint, colorSelect, intBrightness);
+                      break;
+                      }
+                      case 3: //UCS2804
+                      {
+                      //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800); // Initialize with 0 LEDs initially
+                      break;
+                      }
+                      case 4: //WS2814
+                      {
+                      //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800);
+                      break;
+                      }
+                    }
                 } else if (strPlaceHolder == "White") {
                     colorSelect = 3;  // 3 for White
                     strPlaceHolder = "";  // Clear the buffer
                     Serial.println("W");
+                    switch(chipsetInt)
+                    {
+                      case 1: //WS2811
+                      {
+                      fastLED(leds, cutpoint, colorSelect, intBrightness);
+                      break;
+                      }
+                      case 2: //TX1818
+                      {
+                      fastLED(leds, cutpoint, colorSelect, intBrightness);
+                      break;
+                      }
+                      case 3: //UCS2804
+                      {
+                      //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800); // Initialize with 0 LEDs initially
+                      break;
+                      }
+                      case 4: //WS2814
+                      {
+                      //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800);
+                      break;
+                      }
+                    }
                 }
-              }
+            } //End of color command
           else if (isCutpointReceived && isChipsetReceived && isNumber(strPlaceHolder))
           {
+            String strBrightness = strPlaceHolder; 
+            intBrightness = strBrightness.toInt();  // Convert to integer
+            intBrightness = constrain(intBrightness, 0, 255); //Constrain brightness
             Serial.print("Brightness: ");
-            Serial.println(strPlaceHolder);
+            Serial.println(intBrightness);
             strPlaceHolder = "";
+
+            switch(chipsetInt)
+            {
+              case 1: //WS2811
+              {
+              fastLED(leds, cutpoint, colorSelect, intBrightness);
+              break;
+              }
+              case 2: //TX1818
+              {
+              fastLED(leds, cutpoint, colorSelect, intBrightness);
+              break;
+              }
+              case 3: //UCS2804
+              {
+              //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800); // Initialize with 0 LEDs initially
+              break;
+              }
+              case 4: //WS2814
+              {
+              //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800);
+              break;
+              }
+            }
           }
-        }
-      }
+        }// end of if/else SerialBT.available
+      }// end of if SerialBT.hasclient
 }
 
 bool isNumber(String str) {
