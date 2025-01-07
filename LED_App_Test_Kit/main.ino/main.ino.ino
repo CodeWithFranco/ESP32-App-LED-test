@@ -121,14 +121,16 @@ void loop() {
                       fastLED(leds, cutpoint, colorSelect, intBrightness);
                       break;
                       }
-                      case 3: //UCS2804
+                      case 3: //UCS2904
                       {
                       //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800); // Initialize with 0 LEDs initially
+                      neoPixel_UCS2904B(cutpoint, colorSelect, intBrightness);
                       break;
                       }
                       case 4: //WS2814
                       {
                       //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800);
+                      neoPixel_WS2814(cutpoint, colorSelect, intBrightness);
                       break;
                       }
                     }
@@ -148,14 +150,16 @@ void loop() {
                       fastLED(leds, cutpoint, colorSelect, intBrightness);
                       break;
                       }
-                      case 3: //UCS2804
+                      case 3: //UCS2904
                       {
                       //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800); // Initialize with 0 LEDs initially
+                      neoPixel_UCS2904B(cutpoint, colorSelect, intBrightness);
                       break;
                       }
                       case 4: //WS2814
                       {
                       //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800);
+                      neoPixel_WS2814(cutpoint, colorSelect, intBrightness);
                       break;
                       }
                     }
@@ -178,11 +182,13 @@ void loop() {
                       case 3: //UCS2804
                       {
                       //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800); // Initialize with 0 LEDs initially
+                      neoPixel_UCS2904B(cutpoint, colorSelect, intBrightness);
                       break;
                       }
                       case 4: //WS2814
                       {
                       //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800);
+                      neoPixel_WS2814(cutpoint, colorSelect, intBrightness);
                       break;
                       }
                     }
@@ -205,11 +211,13 @@ void loop() {
                       case 3: //UCS2804
                       {
                       //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800); // Initialize with 0 LEDs initially
+                      neoPixel_UCS2904B(cutpoint, colorSelect, intBrightness);
                       break;
                       }
                       case 4: //WS2814
                       {
                       //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800);
+                      neoPixel_WS2814(cutpoint, colorSelect, intBrightness);
                       break;
                       }
                     }
@@ -236,14 +244,16 @@ void loop() {
               fastLED(leds, cutpoint, colorSelect, intBrightness);
               break;
               }
-              case 3: //UCS2804
+              case 3: //UCS2904
               {
               //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800); // Initialize with 0 LEDs initially
+              neoPixel_UCS2904B(cutpoint, colorSelect, intBrightness);
               break;
               }
               case 4: //WS2814
               {
               //Adafruit_NeoPixel strip = Adafruit_NeoPixel(cutpoint, PIN, NEO_RGBW + NEO_KHZ800);
+              neoPixel_WS2814(cutpoint, colorSelect, intBrightness);
               break;
               }
             }
