@@ -31,110 +31,107 @@ int intBrightness = 1;       // initial brightness
 bool isBTStarted = false;     // Track BT state
 bool isCutpointReceived = false;  // Flag to track Cutpoint reception
 bool isChipsetReceived = false;   // Flag to track Chipset reception
-<<<<<<< Updated upstream
 bool isColorSelected = false;     // Flag to track color selection
 
 
 BluetoothSerial SerialBT;     // Bluetooth object
-=======
-bool colorSelect = false; // Flag to track if color has been selected
 String currentColor = ""; //Placeholder for colors - R G B W
->>>>>>> Stashed changes
+
 
 void setup() {
-    Serial.begin(115200);
-    delay(100);                   //Allow some time for initialization
-    SerialBT.begin("ESP32_LED");  // Start Bluetooth with the name "ESP32_LED"
-    Serial.println("Bluetooth started. Ready to connect.");
+  Serial.begin(115200);
+  delay(100);                   //Allow some time for initialization
+  SerialBT.begin("ESP32_LED");  // Start Bluetooth with the name "ESP32_LED"
+  Serial.println("Bluetooth started. Ready to connect.");
 
-    // Wait for Bluetooth client to connect
-    while (!SerialBT.hasClient()) {
-        delay(100);  // Wait for a client
-        Serial.print(".");
-    }
-    Serial.println("\nBluetooth connected!");
+  // Wait for Bluetooth client to connect
+  while (!SerialBT.hasClient()) {
+      delay(100);  // Wait for a client
+      Serial.print(".");
+  }
+  Serial.println("\nBluetooth connected!");
 
 
-    // Process commands from Bluetooth
-    while (!isCutpointReceived || !isChipsetReceived) {
-      if (SerialBT.available())
+  // Process commands from Bluetooth
+  while (!isCutpointReceived || !isChipsetReceived) {
+    if (SerialBT.available())
+    {
+      delay(15);  // Small delay for stable input
+      strPlaceHolder = SerialBT.readStringUntil('\n');  // Read one string at a time
+
+      // Debugging
+      //Serial.print("Received command: ");
+      //Serial.println(strPlaceHolder);
+
+      // Process Cutpoint command
+      if (strPlaceHolder.startsWith("Cutpoint=") && strPlaceHolder.length() >= 12 && !isCutpointReceived) 
       {
-        delay(15);  // Small delay for stable input
-        strPlaceHolder = SerialBT.readStringUntil('\n');  // Read one string at a time
+          int startIndex1 = 9;  // Position after "Cutpoint="
+          String cutpointStr = strPlaceHolder.substring(startIndex1, startIndex1 + 3);  // Extract 3 digits
+          cutpoint = cutpointStr.toInt();  // Convert to integer
+          if (cutpoint > 0) 
+          {  // Validate cutpoint value
+              isCutpointReceived = true;  // Mark Cutpoint as received
+              Serial.print("Cutpoint received: ");
+              Serial.println(cutpoint);
+              /*Check for MAX cut points*/ 
+              if (cutpoint > MAX_CP){
+                cutpoint = MAX_CP;
+              }
+              else if (cutpoint <= 0){
+                cutpoint = 1; // Make sure it's at least 1
+              }
+              leds = new CRGB[cutpoint];      //  Allocate memory for the LED array based on user input
+              strPlaceHolder = "";  // Clear the buffer
+          } 
+      }
+      // Process Chipset command
+      else if (strPlaceHolder.startsWith("Chipset=") && strPlaceHolder.length() >= 9 && !isChipsetReceived) 
+      {
+          int startIndex2 = 8;  // Position after "Chipset="
+          chipsetStr = strPlaceHolder.substring(startIndex2);
+          if (chipsetStr.length() > 0) 
+          {  // Validate chipset value
+              isChipsetReceived = true;
+              chipsetInt = chipsetStr.toInt();
+              Serial.print("Chipset received: ");
+              Serial.println(chipsetInt);
+              strPlaceHolder = "";  // Clear the buffer
 
-        // Debugging
-        //Serial.print("Received command: ");
-        //Serial.println(strPlaceHolder);
-
-        // Process Cutpoint command
-        if (strPlaceHolder.startsWith("Cutpoint=") && strPlaceHolder.length() >= 12 && !isCutpointReceived) 
-        {
-            int startIndex1 = 9;  // Position after "Cutpoint="
-            String cutpointStr = strPlaceHolder.substring(startIndex1, startIndex1 + 3);  // Extract 3 digits
-            cutpoint = cutpointStr.toInt();  // Convert to integer
-            if (cutpoint > 0) 
-            {  // Validate cutpoint value
-                isCutpointReceived = true;  // Mark Cutpoint as received
-                Serial.print("Cutpoint received: ");
-                Serial.println(cutpoint);
-                /*Check for MAX cut points*/ 
-                if (cutpoint > MAX_CP){
-                  cutpoint = MAX_CP;
-                }
-                else if (cutpoint <= 0){
-                  cutpoint = 1; // Make sure it's at least 1
-                }
-                leds = new CRGB[cutpoint];      //  Allocate memory for the LED array based on user input
-                strPlaceHolder = "";  // Clear the buffer
-            } 
-        }
-        // Process Chipset command
-        else if (strPlaceHolder.startsWith("Chipset=") && strPlaceHolder.length() >= 9 && !isChipsetReceived) 
-        {
-            int startIndex2 = 8;  // Position after "Chipset="
-            chipsetStr = strPlaceHolder.substring(startIndex2);
-            if (chipsetStr.length() > 0) 
-            {  // Validate chipset value
-                isChipsetReceived = true;
-                chipsetInt = chipsetStr.toInt();
-                Serial.print("Chipset received: ");
-                Serial.println(chipsetInt);
-                strPlaceHolder = "";  // Clear the buffer
-
-                bool valid_answer = false;
-                while (!valid_answer)                                 // Loop while answer is incorrect
+              bool valid_answer = false;
+              while (!valid_answer)                                 // Loop while answer is incorrect
+              {
+                switch (chipsetInt)
                 {
-                  switch (chipsetInt)
-                  {
-                    case 1:{ //WS2811
-                    FastLED.addLeds<WS2811, PIN, RGB>(leds, cutpoint); //WS2811
-                    valid_answer = true; 
-                    break;
-                    }
-                    case 2:{ //TX1818
-                    FastLED.addLeds<WS2811, PIN, RGB>(leds, cutpoint); //TX1818
-                    valid_answer = true; 
-                    break;
-                    }
-                    case 3:{ //UCS2904B
-                    strip.begin();           // Reinitialize the NeoPixel strip
-                    valid_answer = true; 
-                    break;
-                    }
-                    case 4:{ //WS2814
-                    strip.begin();           // Reinitialize the NeoPixel strip
-                    valid_answer = true;  
-                    break;
-                    }
-                    default: // Invalid Choice
-                    valid_answer = true; 
-                    break;   
-                  } 
-                }
-              }     
-          }
-      } //end of if(SerialBT.available)
-    }//end of while(!isCutpointReceived || !isChipsetReceived) 
+                  case 1:{ //WS2811
+                  FastLED.addLeds<WS2811, PIN, RGB>(leds, cutpoint); //WS2811
+                  valid_answer = true; 
+                  break;
+                  }
+                  case 2:{ //TX1818
+                  FastLED.addLeds<WS2811, PIN, RGB>(leds, cutpoint); //TX1818
+                  valid_answer = true; 
+                  break;
+                  }
+                  case 3:{ //UCS2904B
+                  strip.begin();           // Reinitialize the NeoPixel strip
+                  valid_answer = true; 
+                  break;
+                  }
+                  case 4:{ //WS2814
+                  strip.begin();           // Reinitialize the NeoPixel strip
+                  valid_answer = true;  
+                  break;
+                  }
+                  default: // Invalid Choice
+                  valid_answer = true; 
+                  break;   
+                } 
+              }
+            }     
+        }
+    } //end of if(SerialBT.available)
+  }//end of while(!isCutpointReceived || !isChipsetReceived) 
 }//end of void setup()
 
 void loop() 
@@ -264,38 +261,37 @@ void loop()
               break;
               }
             }
-        }
+          }//end of else if (strPlaceHolder == "White")
     } //End of color command
+
     //brightness level
-    else if (isCutpointReceived && isChipsetReceived && isNumber(strPlaceHolder)) {
+    else if (isCutpointReceived && isChipsetReceived && isNumber(strPlaceHolder)) 
+    {
     int newBrightness = strPlaceHolder.toInt();  // Convert to integer
     newBrightness = constrain(newBrightness, 0, 255); // Constrain brightness
 
-    if (newBrightness != intBrightness) {  // Only update if brightness is different
-        intBrightness = newBrightness;
-        Serial.print("Updated Brightness: ");
-        Serial.println(intBrightness);
+      if (newBrightness != intBrightness) {  // Only update if brightness is different
+          intBrightness = newBrightness;
+          Serial.print("Updated Brightness: ");
+          Serial.println(intBrightness);
 
-        // Apply brightness to the LEDs
-        switch (chipsetInt) {
-            case 1: case 2:
-                fastLED(leds, cutpoint, colorSelect, intBrightness);
-                break;
-            case 3:
-                neoPixel_UCS2904B(cutpoint, colorSelect, intBrightness);
-                break;
-            case 4:
-                neoPixel_WS2814(cutpoint, colorSelect, intBrightness);
-                break;
-        }
-    } else {
-        Serial.println("Brightness unchanged.");
+          // Apply brightness to the LEDs
+          switch (chipsetInt) {
+              case 1: case 2:
+                  fastLED(leds, cutpoint, colorSelect, intBrightness);
+                  break;
+              case 3:
+                  neoPixel_UCS2904B(cutpoint, colorSelect, intBrightness);
+                  break;
+              case 4:
+                  neoPixel_WS2814(cutpoint, colorSelect, intBrightness);
+                  break;
+            }
+        } else {
+            Serial.println("Brightness unchanged.");
+                }
+        strPlaceHolder = "";  // Clear buffer after processing
     }
-    strPlaceHolder = "";  // Clear buffer after processing
-}
-
-<<<<<<< Updated upstream
-
 }
 
 bool isNumber(String str) {
@@ -308,95 +304,3 @@ bool isNumber(String str) {
     }
     return true;
 }
-
-void loop() {
-  if (SerialBT.hasClient()) {
-    if (!isBTStarted) {
-      // Reconnection event
-      Serial.println("Bluetooth Reconnected. Clearing buffers and resetting state...");
-      while (SerialBT.available()) SerialBT.read(); // Clear buffer
-      isCutpointReceived = false;  // Reset flags
-      isChipsetReceived = false;
-      colorSelect = false;
-      strPlaceHolder = "";         // Clear the placeholder string
-      isBTStarted = true;
-    }
-
-    if (SerialBT.available()) {
-      char receivedChar = SerialBT.read();  // Read one character
-      strPlaceHolder += receivedChar;       // Append the character to the buffer
-
-      // Process Cutpoint command
-      if (strPlaceHolder.startsWith("Cutpoint=") && strPlaceHolder.length() >= 12 && !isCutpointReceived) {
-        int startIndex1 = 9;  // Position after "Cutpoint="
-        String cutpointStr = strPlaceHolder.substring(startIndex1, startIndex1 + 3);  // Extract 3 digits
-        cutpoint = cutpointStr.toInt();  // Convert to integer
-        isCutpointReceived = true;  // Mark Cutpoint as received
-        Serial.print("Cutpoint received: ");
-        Serial.println(cutpoint);
-        strPlaceHolder = "";  // Clear the buffer
-      }
-      // Process Chipset command
-      else if (strPlaceHolder.startsWith("Chipset=") && strPlaceHolder.length() >= 9 && !isChipsetReceived) {
-        int startIndex2 = 8;  // Position after "Chipset="
-        chipsetStr = strPlaceHolder.substring(startIndex2);
-        isChipsetReceived = true;
-        Serial.print("Chipset received: ");
-        Serial.println(chipsetStr);
-        strPlaceHolder = "";  // Clear the buffer
-      }
-      // Process Color Commands (R, G, B, W) and dimming
-      else if (isChipsetReceived && isCutpointReceived) {  // Only process if CP and Chipset are set
-        if (strPlaceHolder.startsWith("R") || strPlaceHolder.startsWith("G") || 
-            strPlaceHolder.startsWith("B") || strPlaceHolder.startsWith("W")) {
-          // Handle dimming commands
-          if (strPlaceHolder.length() > 1) {
-            char color = strPlaceHolder.charAt(0);  // Extract color ('R', 'G', 'B', 'W')
-            int brightness = strPlaceHolder.substring(1).toInt();  // Extract brightness value
-            brightness = constrain(brightness, 0, 255);  // Ensure brightness is within range
-
-            switch (color) {
-              case 'R':
-                Serial.println("Dimming Red: " + String(brightness));
-                break;
-              case 'G':
-                Serial.println("Dimming Green: " + String(brightness));
-                break;
-              case 'B':
-                Serial.println("Dimming Blue: " + String(brightness));
-                break;
-              case 'W':
-                Serial.println("Dimming White: " + String(brightness));
-                break;
-              default:
-                Serial.println("ERROR: Invalid Dimming Command");
-                break;
-            }
-            strPlaceHolder = "";  // Clear buffer after dimming command
-          } else {  // Handle color selection without dimming
-            currentColor = strPlaceHolder;
-            colorSelect = true;
-            Serial.println(currentColor + " Command Received");
-            strPlaceHolder = "";  // Clear the buffer
-          }
-        } else {
-          Serial.println("ERROR: Invalid Color Command");
-          strPlaceHolder = "";  // Clear the buffer
-        }
-      } else {
-        Serial.println("Error: CP and Chipset not received yet");
-        strPlaceHolder = "";  // Clear the buffer
-      }
-    }
-  } else {
-    if (isBTStarted) {
-      Serial.println("Bluetooth Disconnected. Waiting for reconnection...");
-      isBTStarted = false;
-    }
-    delay(5000);
-    Serial.println("Restarting Bluetooth...");
-    SerialBT.begin("ESP32_LED");  // Restart Bluetooth
-    isBTStarted = true;
-  }
-}
-
