@@ -31,10 +31,15 @@ int intBrightness = 1;       // initial brightness
 bool isBTStarted = false;     // Track BT state
 bool isCutpointReceived = false;  // Flag to track Cutpoint reception
 bool isChipsetReceived = false;   // Flag to track Chipset reception
+<<<<<<< Updated upstream
 bool isColorSelected = false;     // Flag to track color selection
 
 
 BluetoothSerial SerialBT;     // Bluetooth object
+=======
+bool colorSelect = false; // Flag to track if color has been selected
+String currentColor = ""; //Placeholder for colors - R G B W
+>>>>>>> Stashed changes
 
 void setup() {
     Serial.begin(115200);
@@ -289,6 +294,7 @@ void loop()
     strPlaceHolder = "";  // Clear buffer after processing
 }
 
+<<<<<<< Updated upstream
 
 }
 
@@ -303,3 +309,95 @@ bool isNumber(String str) {
     return true;
 }
 
+=======
+void loop() {
+  if (SerialBT.hasClient()) {
+    if (!isBTStarted) {
+      // Reconnection event
+      Serial.println("Bluetooth Reconnected. Clearing buffers and resetting state...");
+      while (SerialBT.available()) SerialBT.read(); // Clear buffer
+      isCutpointReceived = false;  // Reset flags
+      isChipsetReceived = false;
+      colorSelect = false;
+      strPlaceHolder = "";         // Clear the placeholder string
+      isBTStarted = true;
+    }
+
+    if (SerialBT.available()) {
+      char receivedChar = SerialBT.read();  // Read one character
+      strPlaceHolder += receivedChar;       // Append the character to the buffer
+
+      // Process Cutpoint command
+      if (strPlaceHolder.startsWith("Cutpoint=") && strPlaceHolder.length() >= 12 && !isCutpointReceived) {
+        int startIndex1 = 9;  // Position after "Cutpoint="
+        String cutpointStr = strPlaceHolder.substring(startIndex1, startIndex1 + 3);  // Extract 3 digits
+        cutpoint = cutpointStr.toInt();  // Convert to integer
+        isCutpointReceived = true;  // Mark Cutpoint as received
+        Serial.print("Cutpoint received: ");
+        Serial.println(cutpoint);
+        strPlaceHolder = "";  // Clear the buffer
+      }
+      // Process Chipset command
+      else if (strPlaceHolder.startsWith("Chipset=") && strPlaceHolder.length() >= 9 && !isChipsetReceived) {
+        int startIndex2 = 8;  // Position after "Chipset="
+        chipsetStr = strPlaceHolder.substring(startIndex2);
+        isChipsetReceived = true;
+        Serial.print("Chipset received: ");
+        Serial.println(chipsetStr);
+        strPlaceHolder = "";  // Clear the buffer
+      }
+      // Process Color Commands (R, G, B, W) and dimming
+      else if (isChipsetReceived && isCutpointReceived) {  // Only process if CP and Chipset are set
+        if (strPlaceHolder.startsWith("R") || strPlaceHolder.startsWith("G") || 
+            strPlaceHolder.startsWith("B") || strPlaceHolder.startsWith("W")) {
+          // Handle dimming commands
+          if (strPlaceHolder.length() > 1) {
+            char color = strPlaceHolder.charAt(0);  // Extract color ('R', 'G', 'B', 'W')
+            int brightness = strPlaceHolder.substring(1).toInt();  // Extract brightness value
+            brightness = constrain(brightness, 0, 255);  // Ensure brightness is within range
+
+            switch (color) {
+              case 'R':
+                Serial.println("Dimming Red: " + String(brightness));
+                break;
+              case 'G':
+                Serial.println("Dimming Green: " + String(brightness));
+                break;
+              case 'B':
+                Serial.println("Dimming Blue: " + String(brightness));
+                break;
+              case 'W':
+                Serial.println("Dimming White: " + String(brightness));
+                break;
+              default:
+                Serial.println("ERROR: Invalid Dimming Command");
+                break;
+            }
+            strPlaceHolder = "";  // Clear buffer after dimming command
+          } else {  // Handle color selection without dimming
+            currentColor = strPlaceHolder;
+            colorSelect = true;
+            Serial.println(currentColor + " Command Received");
+            strPlaceHolder = "";  // Clear the buffer
+          }
+        } else {
+          Serial.println("ERROR: Invalid Color Command");
+          strPlaceHolder = "";  // Clear the buffer
+        }
+      } else {
+        Serial.println("Error: CP and Chipset not received yet");
+        strPlaceHolder = "";  // Clear the buffer
+      }
+    }
+  } else {
+    if (isBTStarted) {
+      Serial.println("Bluetooth Disconnected. Waiting for reconnection...");
+      isBTStarted = false;
+    }
+    delay(5000);
+    Serial.println("Restarting Bluetooth...");
+    SerialBT.begin("ESP32_LED");  // Restart Bluetooth
+    isBTStarted = true;
+  }
+}
+>>>>>>> Stashed changes
