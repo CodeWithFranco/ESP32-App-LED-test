@@ -1,26 +1,23 @@
 #include <FastLED.h>
 
-void fastLED(CRGB* leds, int CP, char color) {
-    if (color == 'R') {
-        // Turn all LEDs to red
-        for (int i = 0; i < CP; i++) {
-            leds[i] = CRGB::Red;
-        }
-    } else if (color == 'G') {
-        // Turn all LEDs to green
-        for (int i = 0; i < CP; i++) {
-            leds[i] = CRGB::Green;
-        }
-    } else if (color == 'B') {
-        // Turn all LEDs to blue
-        for (int i = 0; i < CP; i++) {
-            leds[i] = CRGB::Blue;
-        }
-    } else if (color == 'W') {
-        // Turn all LEDs to white
-        for (int i = 0; i < CP; i++) {
-            leds[i] = CRGB::White;
-        }
+void fastLED(CRGB* leds, int CP, int color, int brightness) {
+    if (leds == nullptr) {
+        Serial.println("Error: LEDs not initialized!");
+        return;
     }
+    if (CP <= 0 || CP > 300) {  // Validate CP
+        Serial.println("Invalid CP value!");
+        return;
+    }
+
+    FastLED.clear();
+    for (int i = 0; i < CP; i++) {
+        if (color == 0) leds[i] = CRGB(brightness, 0, 0);      // Red
+        else if (color == 1) leds[i] = CRGB(0, brightness, 0); // Green
+        else if (color == 2) leds[i] = CRGB(0, 0, brightness); // Blue
+        else if (color == 3) leds[i] = CRGB::White;            // White
+        if (i % 10 == 0) yield();  // Feed the watchdog
+    }
+    FastLED.setBrightness(brightness);
     FastLED.show();
 }
