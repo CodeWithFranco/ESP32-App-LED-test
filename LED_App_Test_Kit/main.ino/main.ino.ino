@@ -309,7 +309,6 @@ bool isNumber(String str) {
     return true;
 }
 
-=======
 void loop() {
   if (SerialBT.hasClient()) {
     if (!isBTStarted) {
