@@ -136,8 +136,15 @@ void setup() {
 
 void loop() 
 {
+    // Check if Bluetooth connection is lost
+    if (!SerialBT.hasClient()) {
+      Serial.println("Bluetooth disconnected. Restarting ESP32...");
+      delay(1000);  // Allow time for message to be sent
+      ESP.restart();  // Reset the ESP32
+    }
+
     strPlaceHolder = SerialBT.readStringUntil('\n');  // Read one string at a time
-    if (strPlaceHolder.isEmpty()) {
+    if (strPlaceHolder.isEmpty()) { // The app sends out an empty string every 400ms for brightness control checks
       Serial.println("Empty input, ignoring...");
       return;
     } 
