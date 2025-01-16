@@ -1,5 +1,5 @@
 #include <Adafruit_NeoPixel.h>
-#define PIN 11
+#define PIN 27
 
 // Function prototypes
 // Forward declaration of the setAllPixels function
@@ -7,21 +7,33 @@ void setAllPixels(int CP, uint8_t red, uint8_t green, uint8_t blue, uint8_t whit
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(0, PIN, NEO_RGBW + NEO_KHZ800); // Initialize with 0 LEDs initially
 
 void neoPixel_UCS2904B(int CP, int color, int brightness) {
-    strip.begin();
-    strip.updateLength(CP);  // Update the length of the strip with the user input
+    static int previousCP = -1;
+    if (CP <= 0 || CP > 300) {  // Validate CP
+        Serial.println("Invalid CP value!");
+        return;
+    }
 
-    if (color == 0) {
-       setAllPixels(CP, brightness, 0, 0, 0);  // Red color 
-    } else if (color == 1) {
-        setAllPixels(CP, 0, brightness, 0, 0);  // Green color 
-    } else if (color == 2) {
-        setAllPixels(CP, 0, 0, brightness, 0);  // Blue
-    } else if (color == 3) {
-        setAllPixels(CP, 0, 0, 0, brightness);  // White
+    if (CP != previousCP) {
+        strip.updateLength(CP);
+        strip.begin();
+        previousCP = CP;
+    }
+
+    uint8_t red = 0, green = 0, blue = 0, white = 0;
+
+    if (color == 0) red = brightness;
+    else if (color == 1) green = brightness;
+    else if (color == 2) blue = brightness;
+    else if (color == 3) white = brightness;
+
+    for (int i = 0; i < CP; i++) {
+        strip.setPixelColor(i, strip.Color(red, green, blue, white));
+        if (i % 10 == 0) yield();  // Feed the watchdog
     }
     strip.show();
     yield();  // Feed the watchdog
 }
+
 
 // Helper function to set all pixels to a given color
 void setAllPixels(int CP, uint8_t red, uint8_t green, uint8_t blue, uint8_t white) {
